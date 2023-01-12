@@ -16,8 +16,7 @@ void main() async {
         apiKey: Constants.apiKey,
         appId: Constants.appId,
         messagingSenderId: Constants.messagingSenderId,
-        projectId: Constants.projectId),
-  );
+        projectId: Constants.projectId));
   } else{
     //run for android
     await Firebase.initializeApp();
@@ -39,13 +38,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    
     super.initState();
-    getUserLoggedinStatus();
+    getUserLoggedInStatus();
   }
 
-  getUserLoggedinStatus() async {
-    await HelperFunctions.getUserLoggedinStatus().then((value) {
+  getUserLoggedInStatus() async {
+    await HelperFunctions.getUserLoggedInStatus().then((value) {
       if (value != null) {
         setState(() {
           _isSignedIn = value;

@@ -2,7 +2,10 @@ import 'package:chat_app/helper/helper_function.dart';
 import 'package:chat_app/pages/auth/register_page.dart';
 import 'package:chat_app/pages/home_page.dart';
 import 'package:chat_app/services/auth_services.dart';
+import 'package:chat_app/services/database_service.dart';
 import 'package:chat_app/widgets/widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
@@ -36,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 const Text(
-                  "Groupie",
+                  "Chatly",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
@@ -144,5 +147,29 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  login(){}
+  login() async{
+    if(formKey.currentState!.validate()){
+      setState(() {
+        _isLoading = true;
+      });
+      await authService.loginWithUserNameandPassword(email, password)
+      .then((value) async{
+        if(value == true){
+          QuerySnapshot snapshot = 
+          await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+          .gettingUserData(email);
+          //saving the  values to the shared preferences
+          await HelperFunctions.saveUserLoggedInStatus(true);
+          await HelperFunctions.saveUserEmailSF(email);
+          await HelperFunctions.saveUserNameSF(snapshot.docs[0]['fullName']);
+          nextScreenReplace(context, const HomePage());
+        } else{
+          showSnackbar(context, Colors.red, value);
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
+    }
+  }
 }
